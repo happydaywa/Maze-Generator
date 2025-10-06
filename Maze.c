@@ -1,15 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include <unistd.h>  // for usleep
+#include <unistd.h>
 
-#define COLUMNS 25 // keep odd
-#define ROWS 24    // keep odd
+#define COLUMNS 25
+#define ROWS 24    
 
 char Board[COLUMNS * ROWS];
 int UnseenTiles = 0;
 
-// Fill the board with walls '#' and cells '*' to be carved
+
 void FillBoard() {
     UnseenTiles = 0;
     for (int y = 0; y < ROWS; y++) {
@@ -26,7 +26,6 @@ void FillBoard() {
     }
 }
 
-// Draw the board in console
 void DrawBoard() {
     for (int i = 0; i < ROWS * COLUMNS; i++) {
         if (i % COLUMNS == 0) putchar('\n');
@@ -44,8 +43,6 @@ void Shuffle(int *array, int n) {
     }
 }
 
-
-
 void Carve(int x, int y) {
     int Directions[4] = {0, 1, 2, 3};
     Shuffle(Directions, 4);
@@ -61,11 +58,41 @@ void Carve(int x, int y) {
         }
         if (nx > 0 && nx < COLUMNS && ny > 0 && ny < ROWS && Board[ny*COLUMNS + nx] == '*') { // If next cell valid
             Board[(y + ny)/2 * COLUMNS + (x + nx)/2] = ' ';
-            Board[ny * COLUMNS + nx] = ' '; // carve cell
+            Board[ny * COLUMNS + nx] = ' ';
 
             Carve(nx, ny);
         }
     }
+}
+
+int DFS(int x, int y, int endX, int endY) {
+    if (x == endX && y == endY) return 1;
+    int Directions[4] = {0, 1, 2, 3};
+
+
+
+    for (int i = 0; i < 4; i++) {
+        int nx = x, ny = y;
+
+        switch (Directions[i]) {
+            case 0: nx += 1; break;
+            case 1: nx -= 1; break;
+            case 2: ny += 1; break;
+            case 3: ny -= 1; break;
+        }
+        if (Board[ny*COLUMNS + nx] == ' ') {
+            Board[ny*COLUMNS + nx] = '*';
+            DrawBoard();
+            usleep(80000);
+
+            if (DFS(nx, ny, endX, endY)) return 1;
+
+            DrawBoard();
+            usleep(80000);
+            Board[ny*COLUMNS + nx] = ' ';
+        }
+    }
+    return 0;
 }
 
 
@@ -75,6 +102,8 @@ int main() {
 
     FillBoard();
     Carve(1, 1);
+    DrawBoard();
+    DFS(1, 1, COLUMNS-2, ROWS-3);
     DrawBoard();
 
     return 0;
