@@ -103,7 +103,7 @@ int main() {
     FillBoard();
     Carve(1, 1);
     DrawBoard();
-    DFS(1, 1, COLUMNS-2, ROWS-3);
+    DFS(0, 1, COLUMNS-2, ROWS-3);
     DrawBoard();
 
     return 0;
